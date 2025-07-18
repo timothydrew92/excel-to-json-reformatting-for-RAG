@@ -28,7 +28,7 @@ excel-rag-converter/
 ## 🚀 Quick Start
 
 ### Demo (No Installation Required)
-1. Open `demo/excel-rag-demo.html` in any browser
+1. Open `[demo/excel-rag-demo.html`](https://codepen.io/timothydrew92/pen/LEppMOe) in any browser
 2. Drag & drop your Excel file
 3. See instant JSON output!
 
