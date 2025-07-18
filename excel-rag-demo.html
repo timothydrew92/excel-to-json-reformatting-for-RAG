@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Excel to RAG JSON Converter</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+            min-height: 600px;
+        }
+
+        .upload-section {
+            padding: 40px;
+            background: #f8f9fa;
+            border-right: 1px solid #e9ecef;
+        }
+
+        .output-section {
+            padding: 40px;
+            background: white;
+        }
+
+        .upload-area {
+            border: 3px dashed #667eea;
+            border-radius: 12px;
+            padding: 60px 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            background: white;
+        }
+
+        .upload-area:hover {
+            border-color: #5a67d8;
+            background: #f7fafc;
+            transform: translateY(-2px);
+        }
+
+        .upload-area.dragover {
+            border-color: #4c51bf;
+            background: #edf2f7;
+            transform: scale(1.02);
+        }
+
+        .upload-icon {
+            font-size: 3rem;
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+
+        .upload-text {
+            font-size: 1.2rem;
+            color: #4a5568;
+            margin-bottom: 15px;
+        }
+
+        .upload-subtext {
+            color: #718096;
+            font-size: 0.9rem;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(102, 126, 234, 0.3);
+        }
+
+        .processing {
+            text-align: center;
+            padding: 40px;
+            color: #667eea;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #e2e8f0;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .output-container {
+            height: 500px;
+            overflow-y: auto;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            background: #1a202c;
+            color: #e2e8f0;
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 14px;
+        }
+
+        .json-output {
+            padding: 20px;
+            white-space: pre-wrap;
+            line-height: 1.6;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .error {
+            background: #fed7d7;
+            border: 1px solid #fc8181;
+            color: #c53030;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .copy-btn {
+            background: #48bb78;
+            margin-left: 10px;
+            padding: 8px 16px;
+            font-size: 0.9rem;
+        }
+
+        .copy-btn:hover {
+            background: #38a169;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .upload-section {
+                border-right: none;
+                border-bottom: 1px solid #e9ecef;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Excel to RAG JSON Converter</h1>
+            <p>Upload your Excel work orders and see the extracted JSON chunks for vector database ingestion</p>
+        </div>
+
+        <div class="main-content">
+            <div class="upload-section">
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-icon">📄</div>
+                    <div class="upload-text">Drop Excel file here</div>
+                    <div class="upload-subtext">or click to browse</div>
+                    <input type="file" id="fileInput" accept=".xlsx,.xls">
+                    <button class="btn" onclick="document.getElementById('fileInput').click()">
+                        Choose File
+                    </button>
+                </div>
+
+                <div id="fileInfo" style="margin-top: 20px; display: none;">
+                    <h3>📁 File Info</h3>
+                    <p id="fileName"></p>
+                    <p id="fileSize"></p>
+                </div>
+            </div>
+
+            <div class="output-section">
+                <div id="initialState">
+                    <h3>🎯 Ready to Extract</h3>
+                    <p>Upload an Excel work order file to see:</p>
+                    <ul style="margin: 20px 0; padding-left: 20px;">
+                        <li>📋 Extracted project metadata</li>
+                        <li>🔍 Searchable SKU specifications</li>
+                        <li>📊 AstraDB-ready JSON format</li>
+                        <li>📈 Processing statistics</li>
+                    </ul>
+                    <p><strong>Perfect for:</strong> Internal chatbots, project searches, and specification lookups</p>
+                </div>
+
+                <div id="processing" style="display: none;">
+                    <div class="processing">
+                        <div class="spinner"></div>
+                        <p>Processing Excel file...</p>
+                        <p style="font-size: 0.9rem; margin-top: 10px;">Extracting sheets, parsing data, creating chunks</p>
+                    </div>
+                </div>
+
+                <div id="results" style="display: none;">
+                    <div class="stats" id="stats"></div>
+                    <div style="display: flex; align-items: center; margin-bottom: 15px;">
+                        <h3>📋 Extracted JSON Chunks</h3>
+                        <button class="btn copy-btn" onclick="copyToClipboard()">📋 Copy All</button>
+                    </div>
+                    <div class="output-container">
+                        <div class="json-output" id="jsonOutput"></div>
+                    </div>
+                </div>
+
+                <div id="error" style="display: none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let extractedData = null;
+
+        // File upload handling
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+
+        uploadArea.addEventListener('click', () => fileInput.click());
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFile(files[0]);
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFile(e.target.files[0]);
+            }
+        });
+
+        function handleFile(file) {
+            // Show file info
+            document.getElementById('fileName').textContent = `📄 ${file.name}`;
+            document.getElementById('fileSize').textContent = `💾 ${(file.size / 1024 / 1024).toFixed(2)} MB`;
+            document.getElementById('fileInfo').style.display = 'block';
+
+            // Show processing state
+            document.getElementById('initialState').style.display = 'none';
+            document.getElementById('processing').style.display = 'block';
+            document.getElementById('results').style.display = 'none';
+            document.getElementById('error').style.display = 'none';
+
+            // Process the file
+            processExcelFile(file);
+        }
+
+        function processExcelFile(file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, {type: 'array'});
+                    
+                    // Extract data using our scaffold logic
+                    const chunks = extractWorkOrderData(workbook);
+                    
+                    // Show results
+                    displayResults(chunks);
+                    
+                } catch (error) {
+                    showError(`Error processing file: ${error.message}`);
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function extractWorkOrderData(workbook) {
+            const chunks = [];
+            
+            // Get all SKU sheets
+            const skuSheets = workbook.SheetNames.filter(name => 
+                name.includes('SKU') && name !== 'Copy_Paste Rows'
+            );
+
+            skuSheets.forEach(sheetName => {
+                try {
+                    const sheet = workbook.Sheets[sheetName];
+                    const sheetChunks = extractSheetData(sheet, sheetName);
+                    chunks.push(...sheetChunks);
+                } catch (error) {
+                    console.warn(`Could not process sheet ${sheetName}:`, error);
+                }
+            });
+
+            return chunks;
+        }
+
+        function extractSheetData(sheet, sheetName) {
+            const chunks = [];
+            
+            // Extract project info
+            const projectInfo = {
+                project_id: getCellValue(sheet, 'B2') || 'Template',
+                project_manager: getCellValue(sheet, 'B3') || 'Demo Manager',
+                salesperson: getCellValue(sheet, 'P3') || 'Demo Sales',
+                notes: getCellValue(sheet, 'B5') || 'Demo notes'
+            };
+
+            // Get SKU count from sheet name
+            const skuCount = getSkuCount(sheetName);
+            
+            // Extract SKU blocks
+            const skuBlocks = extractSkuBlocks(sheet, skuCount);
+            
+            // Create chunks for each SKU
+            skuBlocks.forEach(skuData => {
+                if (hasRealData(skuData)) {
+                    chunks.push(createSkuChunk(projectInfo, skuData, sheetName));
+                }
+            });
+
+            // Add project overview if we have SKUs
+            if (skuBlocks.length > 0) {
+                chunks.push(createProjectChunk(projectInfo, skuBlocks, sheetName));
+            }
+
+            return chunks;
+        }
+
+        function getCellValue(sheet, cellRef) {
+            try {
+                const cell = sheet[cellRef];
+                return cell && cell.v !== undefined ? String(cell.v) : '';
+            } catch (e) {
+                return '';
+            }
+        }
+
+        function getSkuCount(sheetName) {
+            if (sheetName === '1 SKU') return 1;
+            try {
+                return parseInt(sheetName.split(' ')[0]) || 1;
+            } catch (e) {
+                return 1;
+            }
+        }
+
+        function extractSkuBlocks(sheet, skuCount) {
+            const skuBlocks = [];
+            
+            for (let skuNum = 1; skuNum <= skuCount; skuNum++) {
+                // Calculate row positions (SKU blocks are ~9 rows apart)
+                const baseRow = 8;
+                const skuRow = baseRow + ((skuNum - 1) * 9);
+                
+                const skuData = {
+                    sku_number: skuNum,
+                    description: getCellValue(sheet, `D${skuRow + 1}`) || `Demo SKU ${skuNum} Description`,
+                    poa_type: getCellValue(sheet, `A${skuRow + 2}`) || 'Digital Flexo',
+                    file_location: getCellValue(sheet, `D${skuRow + 2}`) || `/demo/project/sku${skuNum}.pdf`,
+                    color_target: getCellValue(sheet, `G${skuRow + 2}`) || '4C + Metallic',
+                    proof_requirements: getCellValue(sheet, `J${skuRow + 2}`) || 'Digital + Press Proof',
+                    substrate: getCellValue(sheet, `M${skuRow + 2}`) || 'Metallized PET/PE',
+                    varnishes: getCellValue(sheet, `P${skuRow + 2}`) || 'UV Spot Varnish',
+                    special_fx: getCellValue(sheet, `U${skuRow + 2}`) || 'Holographic Foil'
+                };
+                
+                skuBlocks.push(skuData);
+            }
+            
+            return skuBlocks;
+        }
+
+        function hasRealData(skuData) {
+            // Check if we have meaningful data vs just template headers
+            const meaningfulFields = ['description', 'file_location'];
+            return meaningfulFields.some(field => 
+                skuData[field] && 
+                !skuData[field].includes('Location') && 
+                !skuData[field].includes('DESCRIPTION')
+            );
+        }
+
+        function createSkuChunk(projectInfo, skuData, sheetName) {
+            const content = `Project ${projectInfo.project_id} - SKU ${skuData.sku_number}
+
+Description: ${skuData.description}
+Production Type: ${skuData.poa_type}
+Material/Substrate: ${skuData.substrate}
+Color Requirements: ${skuData.color_target}
+Proof Requirements: ${skuData.proof_requirements}
+Varnishes: ${skuData.varnishes}
+Special Effects: ${skuData.special_fx}
+File Location: ${skuData.file_location}
+
+Project Manager: ${projectInfo.project_manager}
+Salesperson: ${projectInfo.salesperson}
+Notes: ${projectInfo.notes}`;
+
+            return {
+                document_id: `${projectInfo.project_id}_SKU_${skuData.sku_number}`,
+                chunk_type: 'sku_specification',
+                content: content,
+                metadata: {
+                    project_id: projectInfo.project_id,
+                    sku_number: skuData.sku_number,
+                    sheet_name: sheetName,
+                    substrate: skuData.substrate,
+                    poa_type: skuData.poa_type,
+                    color_target: skuData.color_target,
+                    project_manager: projectInfo.project_manager,
+                    salesperson: projectInfo.salesperson,
+                    has_metallic: skuData.substrate.toLowerCase().includes('metallic') || skuData.color_target.toLowerCase().includes('metallic'),
+                    has_special_effects: Boolean(skuData.special_fx && skuData.special_fx !== 'Special FX'),
+                    material_type: inferMaterialType(skuData.substrate)
+                }
+            };
+        }
+
+        function createProjectChunk(projectInfo, skuBlocks, sheetName) {
+            const skuSummaries = skuBlocks.map(sku => 
+                `- SKU ${sku.sku_number}: ${sku.description} (${sku.substrate})`
+            ).join('\n');
+
+            const content = `Project ${projectInfo.project_id} Overview
+
+Project Manager: ${projectInfo.project_manager}
+Salesperson: ${projectInfo.salesperson}
+Total SKUs: ${skuBlocks.length}
+
+Project Summary: ${generateProjectSummary(skuBlocks)}
+
+SKU Details:
+${skuSummaries}
+
+Notes: ${projectInfo.notes}`;
+
+            return {
+                document_id: `${projectInfo.project_id}_overview`,
+                chunk_type: 'project_overview',
+                content: content,
+                metadata: {
+                    project_id: projectInfo.project_id,
+                    sku_count: skuBlocks.length,
+                    sheet_name: sheetName,
+                    project_manager: projectInfo.project_manager,
+                    salesperson: projectInfo.salesperson,
+                    complexity_level: assessComplexity(skuBlocks),
+                    has_special_effects: skuBlocks.some(sku => sku.special_fx && sku.special_fx !== 'Special FX')
+                }
+            };
+        }
+
+        function inferMaterialType(substrate) {
+            const lower = substrate.toLowerCase();
+            if (lower.includes('pet') || lower.includes('flexible')) return 'flexible_packaging';
+            if (lower.includes('paper') || lower.includes('cardboard')) return 'paper';
+            if (lower.includes('foil') || lower.includes('metallic')) return 'metallic';
+            return 'other';
+        }
+
+        function generateProjectSummary(skuBlocks) {
+            const hasMetallic = skuBlocks.some(sku => sku.substrate.toLowerCase().includes('metallic'));
+            const hasSpecialFX = skuBlocks.some(sku => sku.special_fx && sku.special_fx !== 'Special FX');
+            
+            let summary = 'Production project';
+            if (hasMetallic) summary += ' with metallic finishes';
+            if (hasSpecialFX) summary += ' and special effects';
+            summary += '. ';
+            
+            if (skuBlocks.length > 1) {
+                summary += `Multi-SKU project requiring ${skuBlocks.length} different specifications.`;
+            } else {
+                summary += 'Single SKU project with detailed specifications.';
+            }
+            
+            return summary;
+        }
+
+        function assessComplexity(skuBlocks) {
+            let complexity = 'low';
+            if (skuBlocks.length > 3) complexity = 'medium';
+            if (skuBlocks.length > 6) complexity = 'high';
+            
+            const hasComplexFeatures = skuBlocks.some(sku => 
+                sku.special_fx || sku.varnishes || sku.substrate.includes('Metallic')
+            );
+            if (hasComplexFeatures && complexity === 'low') complexity = 'medium';
+            
+            return complexity;
+        }
+
+        function displayResults(chunks) {
+            extractedData = chunks;
+            
+            // Hide processing, show results
+            document.getElementById('processing').style.display = 'none';
+            document.getElementById('results').style.display = 'block';
+            
+            // Show stats
+            const stats = generateStats(chunks);
+            document.getElementById('stats').innerHTML = stats;
+            
+            // Show JSON output
+            document.getElementById('jsonOutput').textContent = JSON.stringify(chunks, null, 2);
+        }
+
+        function generateStats(chunks) {
+            const skuChunks = chunks.filter(c => c.chunk_type === 'sku_specification');
+            const projectChunks = chunks.filter(c => c.chunk_type === 'project_overview');
+            const avgContentLength = Math.round(chunks.reduce((sum, c) => sum + c.content.length, 0) / chunks.length);
+            
+            return `
+                <div class="stat-card">
+                    <div class="stat-number">${chunks.length}</div>
+                    <div class="stat-label">Total Chunks</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${skuChunks.length}</div>
+                    <div class="stat-label">SKU Specs</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${projectChunks.length}</div>
+                    <div class="stat-label">Projects</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${avgContentLength}</div>
+                    <div class="stat-label">Avg Chunk Size</div>
+                </div>
+            `;
+        }
+
+        function copyToClipboard() {
+            if (extractedData) {
+                navigator.clipboard.writeText(JSON.stringify(extractedData, null, 2))
+                    .then(() => {
+                        const btn = document.querySelector('.copy-btn');
+                        const originalText = btn.textContent;
+                        btn.textContent = '✅ Copied!';
+                        setTimeout(() => btn.textContent = originalText, 2000);
+                    })
+                    .catch(err => console.error('Copy failed:', err));
+            }
+        }
+
+        function showError(message) {
+            document.getElementById('processing').style.display = 'none';
+            const errorDiv = document.getElementById('error');
+            errorDiv.innerHTML = `<div class="error">❌ ${message}</div>`;
+            errorDiv.style.display = 'block';
+        }
+    </script>
+</body>
+</html>
