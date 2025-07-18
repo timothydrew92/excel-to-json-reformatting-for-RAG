@@ -1,0 +1,97 @@
+[
+    {
+      "document_id": "PG26794_SKU_1",
+      "chunk_type": "sku_specification",
+      "content": "Project PG26794 - SKU 1\n\nDescription: Premium Coffee Pouch - 12oz Stand-up\nProduction Type: Digital Flexo\nMaterial/Substrate: Metallized PET/PE Laminate 3.5mil\nColor Requirements: 4C Process + Metallic Silver + UV Spot\nProof Requirements: Digital proof + Press proof required\nVarnishes: UV Spot Varnish on logo area\nSpecial Effects: Holographic foil accent on brand name\nFile Location: /projects/pg26794/artwork/coffee_pouch_v3.pdf\n\nProject Manager: John Smith\nSalesperson: Sarah Johnson\nNotes: Customer requires metallic finish for premium look",
+      "metadata": {
+        "project_id": "PG26794",
+        "sku_number": 1,
+        "sheet_name": "1 SKU",
+        "substrate": "Metallized PET/PE Laminate 3.5mil",
+        "poa_type": "Digital Flexo",
+        "color_target": "4C Process + Metallic Silver + UV Spot",
+        "project_manager": "John Smith",
+        "salesperson": "Sarah Johnson",
+        "has_metallic": true,
+        "has_special_effects": true,
+        "material_type": "flexible_packaging",
+        "complexity_level": "high"
+      }
+    },
+    {
+      "document_id": "PG26794_overview",
+      "chunk_type": "project_overview",
+      "content": "Project PG26794 Overview\n\nProject Manager: John Smith\nSalesperson: Sarah Johnson\nTotal SKUs: 1\n\nProject Summary: Premium coffee packaging with metallic finishes and special effects. Requires high-end production capabilities with UV spot varnish and holographic foil application.\n\nSKU Details:\n- SKU 1: Premium Coffee Pouch using Metallized PET/PE substrate\n- Production: Digital Flexo with 4C + Metallic Silver + UV\n- Special Features: Holographic foil, UV spot varnish\n\nNotes: Customer requires metallic finish for premium look",
+      "metadata": {
+        "project_id": "PG26794",
+        "sku_count": 1,
+        "sheet_name": "1 SKU",
+        "project_manager": "John Smith",
+        "salesperson": "Sarah Johnson",
+        "complexity_level": "high",
+        "has_special_effects": true,
+        "material_types": ["flexible_packaging"],
+        "production_methods": ["Digital Flexo"],
+        "client_requirements": ["metallic_finish", "premium_look"]
+      }
+    },
+    {
+      "document_id": "PG27851_SKU_1",
+      "chunk_type": "sku_specification", 
+      "content": "Project PG27851 - SKU 1\n\nDescription: Snack Bar Wrapper - Multi-pack\nProduction Type: Gravure\nMaterial/Substrate: BOPP/PE Laminate\nColor Requirements: 6C Process + White Base\nProof Requirements: Digital proof only\nVarnishes: Matte OPV overall\nSpecial Effects: None\nFile Location: /projects/pg27851/artwork/snack_wrapper_final.pdf\n\nProject Manager: Lisa Chen\nSalesperson: Mike Rodriguez\nNotes: High volume run - efficiency focused",
+      "metadata": {
+        "project_id": "PG27851",
+        "sku_number": 1,
+        "sheet_name": "1 SKU",
+        "substrate": "BOPP/PE Laminate",
+        "poa_type": "Gravure",
+        "color_target": "6C Process + White Base",
+        "project_manager": "Lisa Chen",
+        "salesperson": "Mike Rodriguez",
+        "has_metallic": false,
+        "has_special_effects": false,
+        "material_type": "flexible_packaging",
+        "complexity_level": "medium",
+        "production_focus": "high_volume"
+      }
+    },
+    {
+      "document_id": "PG28902_SKU_1", 
+      "chunk_type": "sku_specification",
+      "content": "Project PG28902 - SKU 1\n\nDescription: Luxury Box Label - Wine Collection\nProduction Type: Digital Sheet-fed\nMaterial/Substrate: Textured Paper Stock 120gsm\nColor Requirements: 4C + 2 Spot (Gold + Burgundy)\nProof Requirements: Digital + Physical substrate proof\nVarnishes: UV Spot on gold elements\nSpecial Effects: Embossed logo, Foil stamping\nFile Location: /projects/pg28902/artwork/wine_label_v2.pdf\n\nProject Manager: David Park\nSalesperson: Jennifer Walsh\nNotes: Premium wine label - quality critical",
+      "metadata": {
+        "project_id": "PG28902",
+        "sku_number": 1,
+        "sheet_name": "1 SKU", 
+        "substrate": "Textured Paper Stock 120gsm",
+        "poa_type": "Digital Sheet-fed",
+        "color_target": "4C + 2 Spot (Gold + Burgundy)",
+        "project_manager": "David Park",
+        "salesperson": "Jennifer Walsh",
+        "has_metallic": true,
+        "has_special_effects": true,
+        "material_type": "paper",
+        "complexity_level": "high",
+        "industry": "wine_beverage",
+        "special_processes": ["embossing", "foil_stamping"]
+      }
+    },
+    {
+      "document_id": "PG28902_overview",
+      "chunk_type": "project_overview",
+      "content": "Project PG28902 Overview\n\nProject Manager: David Park\nSalesperson: Jennifer Walsh\nTotal SKUs: 1\n\nProject Summary: Luxury wine label production with premium finishes. High-end paper stock with embossing and foil stamping for premium brand positioning.\n\nSKU Details:\n- SKU 1: Luxury wine label using textured paper substrate\n- Production: Digital sheet-fed with spot colors\n- Special Features: Embossed logo, gold foil stamping, UV spot varnish\n\nNotes: Premium wine label - quality critical",
+      "metadata": {
+        "project_id": "PG28902",
+        "sku_count": 1,
+        "sheet_name": "1 SKU",
+        "project_manager": "David Park", 
+        "salesperson": "Jennifer Walsh",
+        "complexity_level": "high",
+        "has_special_effects": true,
+        "material_types": ["paper"],
+        "production_methods": ["Digital Sheet-fed"],
+        "industry": "wine_beverage",
+        "brand_positioning": "luxury"
+      }
+    }
+  ]
