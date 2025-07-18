@@ -1,0 +1,20 @@
+# Excel to RAG JSON Converter - Python Dependencies
+
+# Core Excel processing
+pandas>=1.5.0
+openpyxl>=3.1.0
+
+# Optional: Enhanced document processing
+# unstructured>=0.10.0
+
+# Optional: Vector database integrations
+# astrapy>=0.7.0
+# chromadb>=0.4.0
+# pinecone-client>=2.2.0
+
+# Development and testing
+# pytest>=7.0.0
+# jupyter>=1.0.0
+
+# Data processing utilities
+numpy>=1.21.0
